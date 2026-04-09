@@ -51,6 +51,8 @@ for MY_FILE in "${MY_FILES[@]}"; do
 	fi
 done
 
+
+
 # Retry wait time in secounds
 WAIT_SEC=10
 
@@ -109,6 +111,18 @@ fi
 MY_GITHUB_REPOSITORY_OWNER_ID=${GITHUB_REPOSITORY_OWNER_ID:-"0"}
 # Set The ID of the repository (used for Hetzner Cloud Server label).
 MY_GITHUB_REPOSITORY_ID=${GITHUB_REPOSITORY_ID:-"0"}
+
+MY_GITHUB_ORGANIZATION=${INPUT_ORGANIZATION}
+
+if [ -n "$MY_GITHUB_ORGANIZATION" ]; then
+	GITHUB_API_URL="https://api.github.com/orgs/${MY_GITHUB_ORGANIZATION}/actions/runners"
+	GITHUB_URL= "https://github.com/${MY_GITHUB_ORGANIZATION}"
+else
+	GITHUB_API_URL="https://api.github.com/repos/${MY_GITHUB_REPOSITORY}/actions/runners"
+	GITHUB_URL=https://github.com/${MY_GITHUB_REPOSITORY}
+fi
+
+
 
 # Set the Hetzner Cloud API token.
 # Retrieves the value from the INPUT_HCLOUD_TOKEN environment variable.
@@ -269,7 +283,7 @@ if [[ "$MY_MODE" == "delete" ]]; then
 		-H "Accept: application/vnd.github+json" \
 		-H "Authorization: Bearer ${MY_GITHUB_TOKEN}" \
 		-H "X-GitHub-Api-Version: 2022-11-28" \
-		"https://api.github.com/repos/${MY_GITHUB_REPOSITORY}/actions/runners" \
+		"${GITHUB_API_URL}" \
 		|| exit_with_failure "Failed to list GitHub Actions runners from repository!"
 
 	MY_GITHUB_RUNNER_ID=$(jq -er ".runners[] | select(.name == \"$MY_NAME\") | .id" < "github-runners.json")
@@ -287,7 +301,7 @@ if [[ "$MY_MODE" == "delete" ]]; then
 		-H "Accept: application/vnd.github+json" \
 		-H "Authorization: Bearer ${MY_GITHUB_TOKEN}" \
 		-H "X-GitHub-Api-Version: 2022-11-28" \
-		"https://api.github.com/repos/${MY_GITHUB_REPOSITORY}/actions/runners/${MY_GITHUB_RUNNER_ID}" \
+		"${GITHUB_API_URL}/${MY_GITHUB_RUNNER_ID}" \
 		|| exit_with_failure "Failed to delete GitHub Actions Runner from repository! Please delete manually: https://github.com/${MY_GITHUB_REPOSITORY}/settings/actions/runners"
 	echo "GitHub Actions Runner deleted successfully."
 	echo
@@ -311,8 +325,8 @@ curl -L \
 	-o "registration-token.json" \
 	-H "Accept: application/vnd.github+json" \
 	-H "Authorization: Bearer ${MY_GITHUB_TOKEN}" \
-	-H "X-GitHub-Api-Version: 2022-11-28" \
-	"https://api.github.com/repos/${MY_GITHUB_REPOSITORY}/actions/runners/registration-token" \
+	-H "X-GitHub-Api-Version: 2026-03-10" \
+	"${GITHUB_API_URL}/registration-token" \
 	|| exit_with_failure "Failed to retrieve GitHub Actions Runner registration token!"
 
 # Read the GitHub Runner registration token from a file (assuming valid JSON)
@@ -342,6 +356,7 @@ export MY_NAME
 export MY_PRE_RUNNER_SCRIPT_BASE64
 export MY_RUNNER_DIR
 export MY_RUNNER_VERSION
+export GITHUB_URL
 # Substitute environment variables in the cloud-init template and create the final cloud-init configuration
 if [[ ! -f "cloud-init.template.yml" ]]; then
 	exit_with_failure "cloud-init.template.yml not found!"
@@ -360,6 +375,7 @@ jq -n \
 	--arg     image           "$MY_IMAGE" \
 	--arg     server_type     "$MY_SERVER_TYPE" \
 	--arg     name            "$MY_NAME" \
+	--arg	  org			  "$MY_GITHUB_ORGANIZATION"
 	--argjson enable_ipv4     "$MY_ENABLE_IPV4" \
 	--argjson enable_ipv6     "$MY_ENABLE_IPV6" \
 	--rawfile cloud_init_yml  "cloud-init.yml" \
@@ -488,7 +504,7 @@ while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
 		-H "Accept: application/vnd.github+json" \
 		-H "Authorization: Bearer ${MY_GITHUB_TOKEN}" \
 		-H "X-GitHub-Api-Version: 2022-11-28" \
-		"https://api.github.com/repos/${MY_GITHUB_REPOSITORY}/actions/runners" \
+		"${GITHUB_API_URL}" \
 		|| exit_with_failure "Failed to list GitHub Actions runners from repository!"
 
 	MY_GITHUB_RUNNER_ID=$(jq -er ".runners[] | select(.name == \"$MY_NAME\") | .id" < "github-runners.json")
@@ -509,8 +525,8 @@ fi
 
 echo
 echo "The Hetzner Cloud Server and its associated GitHub Actions Runner are ready for use." 
-echo "Runner: https://github.com/${MY_GITHUB_REPOSITORY}/settings/actions/runners/${MY_GITHUB_RUNNER_ID}"
+echo "Runner: ${GITHUB_URL}/settings/actions/runners/${MY_GITHUB_RUNNER_ID}"
 # Add GitHub Action job summary 
 # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary
-echo "The Hetzner Cloud Server and its associated [GitHub Actions Runner](https://github.com/${MY_GITHUB_REPOSITORY}/settings/actions/runners/${MY_GITHUB_RUNNER_ID}) are ready for use 🚀" >> "$GITHUB_STEP_SUMMARY"
+echo "The Hetzner Cloud Server and its associated [GitHub Actions Runner](${GITHUB_URL}/settings/actions/runners/${MY_GITHUB_RUNNER_ID}) are ready for use 🚀" >> "$GITHUB_STEP_SUMMARY"
 exit 0

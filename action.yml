@@ -160,3 +160,4 @@ runs:
         INPUT_SERVER_WAIT: ${{ inputs.server_wait }}
         INPUT_SSH_KEY: ${{ inputs.ssh_key }}
         INPUT_VOLUME: ${{ inputs.volume }}
+        INPUT_ORGANIZATION: ${{ inputs.org }}
