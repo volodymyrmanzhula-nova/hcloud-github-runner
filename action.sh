@@ -375,7 +375,7 @@ jq -n \
 	--arg     image           "$MY_IMAGE" \
 	--arg     server_type     "$MY_SERVER_TYPE" \
 	--arg     name            "$MY_NAME" \
-	--arg	  org			  "$MY_GITHUB_ORGANIZATION"
+	--arg	  org			  "$MY_GITHUB_ORGANIZATION" \
 	--argjson enable_ipv4     "$MY_ENABLE_IPV4" \
 	--argjson enable_ipv6     "$MY_ENABLE_IPV6" \
 	--rawfile cloud_init_yml  "cloud-init.yml" \
