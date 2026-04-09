@@ -287,6 +287,8 @@ if [[ "$MY_MODE" == "delete" ]]; then
 		|| exit_with_failure "Failed to list GitHub Actions runners from repository!"
 
 	MY_GITHUB_RUNNER_ID=$(jq -er ".runners[] | select(.name == \"$MY_NAME\") | .id" < "github-runners.json")
+
+	cat github-runners.json
 	# Check if MY_GITHUB_RUNNER_ID is an integer
 	if [[ ! "$MY_GITHUB_RUNNER_ID" =~ ^[0-9]+$ ]]; then
 		exit_with_failure "Failed to get ID of the GitHub Actions Runner!"
