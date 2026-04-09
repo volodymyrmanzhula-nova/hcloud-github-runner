@@ -116,7 +116,7 @@ MY_GITHUB_ORGANIZATION=${INPUT_ORGANIZATION}
 
 if [ -n "$MY_GITHUB_ORGANIZATION" ]; then
 	GITHUB_API_URL="https://api.github.com/orgs/${MY_GITHUB_ORGANIZATION}/actions/runners"
-	GITHUB_URL= "https://github.com/${MY_GITHUB_ORGANIZATION}"
+	GITHUB_URL="https://github.com/${MY_GITHUB_ORGANIZATION}"
 else
 	GITHUB_API_URL="https://api.github.com/repos/${MY_GITHUB_REPOSITORY}/actions/runners"
 	GITHUB_URL=https://github.com/${MY_GITHUB_REPOSITORY}
