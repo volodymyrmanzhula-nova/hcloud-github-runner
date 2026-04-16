@@ -11,7 +11,7 @@ runcmd:
   - udevadm trigger -c add -s block -p ID_VENDOR=HC -p ID_MODEL=Volume
   - export RUNNER_ALLOW_RUNASROOT=1
   - bash $MY_RUNNER_DIR/pre_runner_script.sh
-  - $MY_RUNNER_DIR/config.sh --url "${GITHUB_URL}" --token "${MY_GITHUB_RUNNER_REGISTRATION_TOKEN}" --name "${MY_NAME}" --labels "${MY_NAME},hetzner" --unattended --no-default-labels --disableupdate
+  - $MY_RUNNER_DIR/config.sh --url "${GITHUB_URL}" --token "${MY_GITHUB_RUNNER_REGISTRATION_TOKEN}" --name "${MY_NAME}" --labels "${MY_NAME},hetzner,${MY_LABELS}" --unattended --no-default-labels --disableupdate
   - $MY_RUNNER_DIR/run.sh
 write_files:
   - path: $MY_RUNNER_DIR/pre_runner_script.sh

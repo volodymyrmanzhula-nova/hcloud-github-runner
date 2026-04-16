@@ -122,6 +122,11 @@ inputs:
       Github Organization
     required: false
     default: ''
+  labels:
+    description: >-
+      Custom labels for runners
+    required: false
+    default: ''
 
 outputs:
   label:
@@ -166,3 +171,4 @@ runs:
         INPUT_SSH_KEY: ${{ inputs.ssh_key }}
         INPUT_VOLUME: ${{ inputs.volume }}
         INPUT_ORGANIZATION: ${{ inputs.org }}
+        INPUT_LABELS: ${{ inputs.labels }}

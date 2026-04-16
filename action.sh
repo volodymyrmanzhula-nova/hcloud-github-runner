@@ -122,7 +122,7 @@ else
 	GITHUB_URL=https://github.com/${MY_GITHUB_REPOSITORY}
 fi
 
-
+MY_LABELS=${INPUT_LABELS:""}
 
 # Set the Hetzner Cloud API token.
 # Retrieves the value from the INPUT_HCLOUD_TOKEN environment variable.
@@ -358,6 +358,7 @@ export MY_PRE_RUNNER_SCRIPT_BASE64
 export MY_RUNNER_DIR
 export MY_RUNNER_VERSION
 export GITHUB_URL
+export MY_LABELS
 # Substitute environment variables in the cloud-init template and create the final cloud-init configuration
 if [[ ! -f "cloud-init.template.yml" ]]; then
 	exit_with_failure "cloud-init.template.yml not found!"
